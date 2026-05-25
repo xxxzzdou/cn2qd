@@ -3,7 +3,8 @@ import json
 import time
 from datetime import datetime
 
-# ====================== 多账号配置 ======================
+# ====================== 【配置区域】 ======================
+# 1. 多账号 Cookie（每个账号一行）
 ACCOUNTS = [
     {
         "name": "账号1",
@@ -19,11 +20,29 @@ ACCOUNTS = [
     },
 ]
 
+# 2. Server 酱 SendKey（去 sct.ftqq.com 复制）
+SERVER_KEY = "SCT354333T99vc4DlKnPhJMTEauGDFQNYX"
+
+# 基础配置（不用改）
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36 Edg/147.0.0.0"
 BASE_URL = "https://justcn2.top"
 CHECKIN_URL = f"{BASE_URL}/user/checkin"
 ACCOUNT_DELAY = 8
-# ======================================================
+# ==========================================================
+
+def send_server(title, content):
+    """Server 酱推送"""
+    if not SERVER_KEY:
+        return
+    url = f"https://sctapi.ftqq.com/{SERVER_KEY}.send"
+    data = {
+        "title": title,
+        "desp": content
+    }
+    try:
+        requests.post(url, data=data, timeout=10)
+    except:
+        pass
 
 def create_session(cookie):
     session = requests.Session()
@@ -42,46 +61,58 @@ def create_session(cookie):
     })
     return session
 
-def check_login(session, name):
+def check_login(session):
     try:
         r = session.get(f"{BASE_URL}/user", timeout=15)
         return r.status_code == 200
     except:
         return False
 
-def checkin(session, name):
+def checkin(session):
     try:
         r = session.post(CHECKIN_URL, timeout=15)
-        if r.status_code == 200:
-            print(f"✅ {name} 签到成功")
-            return True
-        else:
-            print(f"❌ {name} 签到失败，状态码：{r.status_code}")
-            return False
-    except Exception as e:
-        print(f"❌ {name} 网络错误：{e}")
+        return r.status_code == 200
+    except:
         return False
 
 def main():
-    print("===== justcn2.top 多账号自动签到 =====")
-    ok = 0
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(f"===== justcn2 自动签到 {now} =====")
+    
+    success = 0
     fail = 0
+    msg_list = []
+
     for idx, acc in enumerate(ACCOUNTS):
         name = acc["name"]
         ck = acc["cookie"]
-        print(f"\n[{idx+1}/{len(ACCOUNTS)}] {name}")
+        print(f"\n[{idx+1}] {name}")
+        
         s = create_session(ck)
-        if not check_login(s, name):
-            print(f"❌ Cookie 无效")
-            fail +=1
+        if not check_login(s):
+            print("❌ Cookie 无效")
+            msg_list.append(f"❌ {name}：Cookie 已失效")
+            fail += 1
             continue
-        if checkin(s, name):
-            ok +=1
+
+        if checkin(s):
+            print("✅ 签到成功")
+            msg_list.append(f"✅ {name}：签到成功")
+            success += 1
         else:
-            fail +=1
+            print("❌ 签到失败")
+            msg_list.append(f"❌ {name}：签到失败")
+            fail += 1
+
         if idx != len(ACCOUNTS)-1:
             time.sleep(ACCOUNT_DELAY)
-    print(f"\n===== 签到完成：成功 {ok} 个，失败 {fail} 个 =====")
+
+    # 推送结果
+    title = f"justcn 签到结果：成功{success}个 | 失败{fail}个"
+    content = "\n".join(msg_list)
+    send_server(title, content)
+    
+    print(f"\n===== 完成：成功 {success} | 失败 {fail} =====")
 
 if __name__ == "__main__":
     main()
