@@ -2,22 +2,28 @@ name: Auto Checkin
 
 on:
   schedule:
-    - cron: "*/1 * * * *"
+    - cron: "0 2 * * *"  # 每天北京时间10:00
   workflow_dispatch:
 
 jobs:
   run:
     runs-on: ubuntu-latest
+    env:
+      # 账号1
+      ACCOUNT1_EMAIL: ${{ secrets.ACCOUNT1_EMAIL }}
+      ACCOUNT1_PASSWORD: ${{ secrets.ACCOUNT1_PASSWORD }}
+      # 账号2（如果有）
+      ACCOUNT2_EMAIL: ${{ secrets.ACCOUNT2_EMAIL }}
+      ACCOUNT2_PASSWORD: ${{ secrets.ACCOUNT2_PASSWORD }}
+      # Server酱
+      SERVER_KEY: ${{ secrets.SERVER_KEY }}
+      # 消除Node.js警告
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
-      - name: Install requests
-        run: pip install requests
-
-      - name: Run
-        run: python checkin.py
+      - run: pip install requests
+      - run: python checkin.py
