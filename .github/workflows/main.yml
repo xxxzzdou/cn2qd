@@ -2,7 +2,7 @@ name: Auto Checkin
 
 on:
   schedule:
-    - cron: "0 2 * * *"  # 每天北京时间 10:00 自动运行
+    - cron: "*/15 * * * *"  # 每天北京时间 10:00 自动运行
   workflow_dispatch:     # 允许手动点击运行
 
 jobs:
