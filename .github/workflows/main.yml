@@ -2,7 +2,7 @@ name: Auto Checkin
 
 on:
   schedule:
-    - cron: "1 0 * * *"  # 每天北京时间10:00
+    - cron: "8 16 * * *"  # 
   workflow_dispatch:
 
 jobs:
@@ -15,6 +15,9 @@ jobs:
       # 账号2（如果有）
       ACCOUNT2_EMAIL: ${{ secrets.ACCOUNT2_EMAIL }}
       ACCOUNT2_PASSWORD: ${{ secrets.ACCOUNT2_PASSWORD }}
+      # 账号2（如果有）
+      ACCOUNT3_EMAIL: ${{ secrets.ACCOUNT3_EMAIL }}
+      ACCOUNT3_PASSWORD: ${{ secrets.ACCOUNT3_PASSWORD }}
       # Server酱
       SERVER_KEY: ${{ secrets.SERVER_KEY }}
       # 消除Node.js警告
