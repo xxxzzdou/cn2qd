@@ -22,6 +22,11 @@ ACCOUNTS = [
         "email": os.environ.get("ACCOUNT3_EMAIL", ""),
         "password": os.environ.get("ACCOUNT3_PASSWORD", "")
     },
+    {
+        "name": "小号3",
+        "email": os.environ.get("ACCOUNT4_EMAIL", ""),
+        "password": os.environ.get("ACCOUNT4_PASSWORD", "")
+    },
 ]
 
 # Server酱推送Key
